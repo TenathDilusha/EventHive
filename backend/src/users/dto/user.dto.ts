@@ -1,0 +1,42 @@
+import { IsString, IsEmail, IsOptional, IsEnum } from 'class-validator';
+import { UserRole } from '../entities/user.entity';
+
+export class CreateUserDto {
+    @IsString()
+    firstName: string;
+
+    @IsString()
+    lastName: string;
+
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    password: string;
+
+    @IsEnum(UserRole)
+    @IsOptional()
+    role?: UserRole;
+
+    @IsString()
+    @IsOptional()
+    department?: string;
+}
+
+export class UpdateUserDto {
+    @IsString()
+    @IsOptional()
+    firstName?: string;
+
+    @IsString()
+    @IsOptional()
+    lastName?: string;
+
+    @IsString()
+    @IsOptional()
+    department?: string;
+
+    @IsString()
+    @IsOptional()
+    avatarUrl?: string;
+}
