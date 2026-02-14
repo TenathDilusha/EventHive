@@ -1,29 +1,66 @@
-function Dashboard() {
+import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Sidebar from "../components/Sidebar";
+import DashboardOverview from "./dashboard/DashboardOverview";
+import MyEvents from "./dashboard/MyEvents";
+import MyRegistrations from "./dashboard/MyRegistrations";
+import CreateEvent from "./dashboard/CreateEvent";
+import ManageEvents from "./dashboard/ManageEvents";
+import Approvals from "./dashboard/Approvals";
+
+export default function Dashboard() {
+  const { isAuthenticated, isAdmin, isOrganizer } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
-    <div className="flex">
-      <div className="w-64 bg-gray-800 text-white min-h-screen p-4">
-        Sidebar
-      </div>
+    <div className="dashboard-layout" id="dashboard-page">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold">
-          Dashboard
-        </h1>
+      <main className="dashboard-main">
+        {/* Mobile sidebar toggle */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          style={{
+            display: "none",
+            position: "fixed",
+            top: "16px",
+            left: "16px",
+            zIndex: "200",
+            background: "var(--dark-800)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "var(--radius-md)",
+            padding: "8px 12px",
+            color: "white",
+            fontSize: "1.2rem",
+          }}
+          className="mobile-sidebar-toggle"
+          id="sidebar-toggle"
+        >
+          ☰
+        </button>
 
-        <div className="grid md:grid-cols-3 gap-6 mt-6">
-          <div className="bg-white p-6 rounded-xl shadow">
-            Total Events
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow">
-            Registered
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow">
-            Upcoming
-          </div>
-        </div>
-      </div>
+        <Routes>
+          <Route index element={<DashboardOverview />} />
+          <Route path="my-events" element={<MyEvents />} />
+          <Route path="registrations" element={<MyRegistrations />} />
+          {isOrganizer && (
+            <Route path="create-event" element={<CreateEvent />} />
+          )}
+          {isAdmin && (
+            <>
+              <Route path="manage-events" element={<ManageEvents />} />
+              <Route path="approvals" element={<Approvals />} />
+              <Route path="users" element={<DashboardOverview />} />
+            </>
+          )}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </main>
     </div>
   );
 }
-
-export default Dashboard;
